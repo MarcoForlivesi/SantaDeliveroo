@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OrbitCamera : MonoBehaviour
+public class OrbitCamera : MonoBehaviour, IMouseHandler
 {
     [SerializeField] private Transform target;
     [Range(1f, 20f)]
@@ -17,7 +17,6 @@ public class OrbitCamera : MonoBehaviour
 
     void LateUpdate()
     {
-        UpdateOrbitAngles();
         Vector3 targetPosition = GetTargetPosition();
         UpdateZoom();
 
@@ -75,13 +74,18 @@ public class OrbitCamera : MonoBehaviour
         return deltaVector;
     }
 
-    private void UpdateOrbitAngles()
+    private void UpdateZoom()
     {
-        if (Input.GetMouseButton(0) == false || Input.GetKey(KeyCode.LeftAlt) == false)
-        {
-            return;
-        }
+        float input = Input.GetAxis("Mouse ScrollWheel");
+        distance = distance - input;
+    }
 
+    public void OnMouseLeftClickDown()
+    {
+    }
+
+    public void OnMouseLeftClick()
+    {
         Vector2 input = new Vector2(
             Input.GetAxis("Mouse Y"),
             Input.GetAxis("Mouse X"));
@@ -90,14 +94,9 @@ public class OrbitCamera : MonoBehaviour
         {
             orbitAngles += rotationSpeed * Time.unscaledDeltaTime * input;
         }
-
-        //Debug.Log($"input { input } orbitAngles { orbitAngles }");
-
     }
 
-    private void UpdateZoom()
+    public void OnMouseLeftClickUp()
     {
-        float input = Input.GetAxis("Mouse ScrollWheel");
-        distance = distance - input;
     }
 }

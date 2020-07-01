@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SantaUnit : MonoBehaviour
+public class SantaUnit : MonoBehaviour, ISelectable
 {
     [Header("Outline")]
     [SerializeField] private Outline outline;
