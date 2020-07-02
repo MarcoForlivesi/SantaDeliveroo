@@ -62,7 +62,10 @@ public class InputManager : MonoBehaviour
 
     public void SetCurrentHandler(IMouseHandler handler)
     {
-        lastMouseHandler = activeMouseHandler;
+        if (activeMouseHandler != orbitCamera)
+        {
+            lastMouseHandler = activeMouseHandler;
+        }
         activeMouseHandler = handler;
     }
 
