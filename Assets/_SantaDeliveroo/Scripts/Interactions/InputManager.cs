@@ -29,7 +29,10 @@ public class InputManager : MonoBehaviour
     {
         SelectionManager.Instance.onSelectionChange += () =>
         {
-            InputManager.Instance.SetCurrentHandler(MoveCommand.Instance);
+            if (SelectionManager.Instance.CurrentSelection.Count > 0)
+            {
+                InputManager.Instance.SetCurrentHandler(MoveCommand.Instance);
+            }
         };
 
         MoveCommand.Instance.onMoveSelected += (list) =>
