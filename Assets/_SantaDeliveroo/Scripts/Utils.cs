@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 public class Utils
 {
     static public bool NearlyZero(float value)
@@ -38,6 +39,24 @@ public class Utils
         if (NearlyZero(vector.z) == false)
         {
             return false;
+        }
+
+        return true;
+    }
+
+    static public bool Equals<T>(List<T> first, List<T> second)
+    {
+        if (first.Count != second.Count)
+        {
+            return false;
+        }
+
+        foreach (T item in second)
+        {
+            if (first.Contains(item) == false)
+            {
+                return false;
+            }
         }
 
         return true;

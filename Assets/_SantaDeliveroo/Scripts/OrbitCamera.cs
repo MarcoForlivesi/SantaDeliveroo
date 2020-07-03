@@ -9,11 +9,11 @@ public class OrbitCamera : MonoBehaviour, IMouseHandler
     [SerializeField] float distance = 5f;
     [Range(1f, 20f)]
     [SerializeField] private float smoothSpeed = 1f;
+    [SerializeField] private Vector2 orbitAngles;
 
     [SerializeField] private Vector2 rotationSpeed;
 
     private Vector2 lookPosition;
-    private Vector2 orbitAngles;
 
     void LateUpdate()
     {

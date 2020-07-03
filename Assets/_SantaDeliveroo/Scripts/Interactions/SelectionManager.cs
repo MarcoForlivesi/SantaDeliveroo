@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class SelectionManager : MonoBehaviour, IMouseHandler
 {
+    public event System.Action onSelectionChange;
+
     static public SelectionManager Instance => instance;
     public  List<Transform> CurrentSelection => currentSelection;
 
@@ -36,6 +38,7 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
 
     public void OnMouseLeftClickDown()
     {
+        List<Transform> lastSelection = new List<Transform>(currentSelection);
         DeselectAll();
 
         Ray raycastVector = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -51,6 +54,11 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
                 currentSelection.Add(raycastHit.collider.transform);
             }
         }
+
+        if (Utils.Equals(currentSelection, lastSelection) == false)
+        {
+            SelectionChange();
+        }
     }
 
     public void OnMouseLeftClick()
@@ -59,9 +67,13 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
 
     public void OnMouseLeftClickUp()
     {
-        if (currentSelection.Count > 0)
+    }
+
+    private void SelectionChange()
+    {
+        if (onSelectionChange != null)
         {
-            InputManager.Instance.SetMoveCommand();
+            onSelectionChange.Invoke();
         }
     }
 }
