@@ -23,5 +23,20 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         santaUnits = GameObject.FindObjectsOfType<SantaUnit>().ToList();
+        MoveCommand.Instance.onMoveSelected += OnMoveCommand;
+    }
+
+    private void OnMoveCommand(List<Vector3> path)
+    {
+        List<Transform> selectedUnit = SelectionManager.Instance.CurrentSelection;
+
+        foreach (Transform selectedTransform in selectedUnit)
+        {
+            PathFollower pathFollower = selectedTransform.GetComponent<PathFollower>();
+            if (pathFollower != null)
+            {
+                pathFollower.SetPath(path);
+            }
+        }
     }
 }

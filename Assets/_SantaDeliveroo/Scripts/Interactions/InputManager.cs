@@ -25,6 +25,19 @@ public class InputManager : MonoBehaviour
         lastMouseHandler = selectionManager;
     }
 
+    private void Start()
+    {
+        SelectionManager.Instance.onSelectionChange += () =>
+        {
+            InputManager.Instance.SetCurrentHandler(MoveCommand.Instance);
+        };
+
+        MoveCommand.Instance.onMoveSelected += (list) =>
+        {
+            InputManager.Instance.SetCurrentHandler(SelectionManager.Instance);
+        };
+    }
+
     void Update()
     {
         

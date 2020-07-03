@@ -39,7 +39,10 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
     public void OnMouseLeftClickDown()
     {
         List<Transform> lastSelection = new List<Transform>(currentSelection);
-        DeselectAll();
+        if (Input.GetKey(KeyCode.LeftControl) == false)
+        {
+            DeselectAll();
+        }
 
         Ray raycastVector = Camera.main.ScreenPointToRay(Input.mousePosition);
         bool hit = Physics.Raycast(raycastVector, out RaycastHit raycastHit, raycastMaxDistance, raycastLayerMask);
@@ -55,9 +58,12 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
             }
         }
 
-        if (Utils.Equals(currentSelection, lastSelection) == false)
+        if (Input.GetKey(KeyCode.LeftControl) == false)
         {
-            SelectionChange();
+            if (Utils.Equals(currentSelection, lastSelection) == false)
+            {
+                SelectionChange();
+            }
         }
     }
 

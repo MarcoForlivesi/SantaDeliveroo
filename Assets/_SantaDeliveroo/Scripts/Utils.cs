@@ -61,4 +61,18 @@ public class Utils
 
         return true;
     }
+
+    static public void AddPosition(LineRenderer lineRenderer, Vector3 position)
+    {
+        Vector3[] positions = new Vector3[lineRenderer.positionCount + 1];
+        for (int i = 0; i < lineRenderer.positionCount; i++)
+        {
+            positions[i] = lineRenderer.GetPosition(i);
+        }
+
+        positions[positions.Length - 1] = position;
+
+        lineRenderer.positionCount = positions.Length;
+        lineRenderer.SetPositions(positions);
+    }
 }
