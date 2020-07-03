@@ -32,6 +32,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private DrawStep drawStep;
     private Vector3 startPosition;
+    private Vector3 circleCenter;
     private Vector3 lastPosition;
     private Vector3 lastHorizontalPosition;
     private Vector3 lastVerticalPosition;
@@ -109,19 +110,22 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private void StartDrawingCircle()
     {
-        lastPosition = startPosition;
+        if (pathLine.positionCount == 0)
+        {
+            Utils.AddPosition(pathLine, startPosition);
+            circleCenter = startPosition;
+        }
 
-        horizontalCircleImage.transform.position = startPosition;
+        lastPosition = circleCenter;
+
+        horizontalCircleImage.transform.position = circleCenter;
         horizontalCircleImage.transform.localScale = new Vector3(minCircleSize, minCircleSize, 1);
         horizontalCircleCollider.enabled = true;
         horizontalCircleImage.gameObject.SetActive(true);
 
         drawStep = DrawStep.DrawingHorizontalCircle;
 
-        if (pathLine.positionCount == 0)
-        {
-            Utils.AddPosition(pathLine, startPosition);
-        }
+        
         Utils.AddPosition(pathLine, lastPosition);
     }
 
@@ -132,11 +136,11 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         lastHorizontalPosition = lastPosition;
 
         horizontalCircleCollider.enabled = false;
-        verticalDistanceImage.transform.position = startPosition;
+        verticalDistanceImage.transform.position = circleCenter;
         verticalDistanceImage.transform.localScale = new Vector3(moveDistance, moveDistance, 1);
         verticalDistanceImage.gameObject.SetActive(true);
 
-        Vector3 circleVector = lastHorizontalPosition - startPosition;
+        Vector3 circleVector = lastHorizontalPosition - circleCenter;
         float angle = Vector3.SignedAngle(circleVector, Camera.main.transform.forward, Vector3.up);
         verticalDistanceImage.transform.rotation = Quaternion.AngleAxis(angle + 90, Vector3.up);
     }
@@ -144,14 +148,14 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
     private void UpdateData()
     {
         Vector3 mousePosition = Input.mousePosition;
-        mousePosition.z = startPosition.z;
+        mousePosition.z = circleCenter.z;
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
         bool hit = Physics.Raycast(ray, out RaycastHit hitInfo, maxDistance, layerMask);
         if (hit)
         {
             pathLine.gameObject.SetActive(true);
             lastPosition = hitInfo.point;
-            moveDistance = Vector3.Distance(startPosition, lastPosition);
+            moveDistance = Vector3.Distance(circleCenter, lastPosition);
             //Debug.Log($"collide: { hitInfo.collider.name } moveDistance: { moveDistance }");
 
             moveDistance = moveDistance * circleScaleFactor;
@@ -162,13 +166,16 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
     private void UpdateHorizontalCircle()
     {
         horizontalCircleImage.transform.localScale = new Vector3(moveDistance, moveDistance, 1);
+        lastHorizontalPosition = lastPosition;
         pathLine.SetPosition(pathLine.positionCount - 1, lastPosition);
+
+        //Debug.Log($"Horizontal Click on: { lastPosition }");
     }
 
     private void UpdateVerticalDistance()
     {
-        Vector3 circleVector = lastHorizontalPosition - startPosition;
-        Vector3 veticalVector = lastPosition - startPosition;
+        Vector3 circleVector = lastHorizontalPosition - circleCenter;
+        Vector3 veticalVector = lastPosition - circleCenter;
 
         float angle = Vector3.SignedAngle(circleVector, veticalVector, Vector3.right);
         float angleAbs = Mathf.Abs(angle);
@@ -184,7 +191,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
         float lenght = Mathf.Tan(angle90Abs * Mathf.Deg2Rad) * circleVector.magnitude;
 
-        lastVerticalPosition = startPosition + veticalVector.normalized * lenght;
+        lastVerticalPosition = circleCenter + veticalVector.normalized * lenght;
         Debug.Log($"veticalVector: { veticalVector } lenght: { lenght } veticalVector.normalized: { veticalVector.normalized } lastVerticalPosition: { lastVerticalPosition } lastPosition: { lastPosition }");
 
         pathLine.SetPosition(pathLine.positionCount - 1, lastVerticalPosition);
@@ -223,11 +230,13 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private void MoveSelected()
     {
+        Debug.Log($"Add point: { lastPosition } startPosition: { startPosition }");
+
         pathList.Add(lastPosition - startPosition);
 
         if (Input.GetKey(KeyCode.LeftControl))
         {
-            SetStartPosition(lastPosition);
+            circleCenter = lastPosition;
             StartDrawingCircle();
         }
         else
