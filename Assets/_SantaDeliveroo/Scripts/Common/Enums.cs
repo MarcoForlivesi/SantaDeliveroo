@@ -9,3 +9,18 @@ public enum GameState
     Win,
     Lost
 }
+
+public enum GiftType
+{
+    SnowWhite,
+    StrippedGreen,
+    DotWhite,
+    DotRed,
+    SnowBlue
+}
+
+public enum SelectableType
+{
+    Santa,
+    House
+}

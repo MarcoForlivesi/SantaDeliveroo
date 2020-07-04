@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Gift : MonoBehaviour, IPointInteractable
 {
+    public GiftType Type => giftType;
+
+    [SerializeField] private GiftType giftType;
     [SerializeField] private Transform hint;
 
     private Rigidbody rigidbody;

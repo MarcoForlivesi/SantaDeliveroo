@@ -12,9 +12,12 @@ public class GameController : MonoBehaviour
 
     public static GameController Instance => instance;
     public List<SantaUnit> SantaUnits => santaUnits;
-    public List<HouseSlot> HouseSlots => houseSlots;
+    public List<Befana> Befanas => befanas;
+    public List<House> HouseSlots => houseSlots;
     public List<Gift> Gifts => gifts;
+    public Transform Honolulu => honolulu;
 
+    [SerializeField] private Transform honolulu;
     [SerializeField] private float levelTimeInSecond;
     [Header("UI - MenuStart")]
     [SerializeField] private Canvas startMenuCanvas;
@@ -33,7 +36,8 @@ public class GameController : MonoBehaviour
     private GameState gameState;
     private float remainingTime;
     private List<SantaUnit> santaUnits;
-    private List<HouseSlot> houseSlots;
+    private List<Befana> befanas;
+    private List<House> houseSlots;
     private List<Gift> gifts;
 
     // Start is called before the first frame update
@@ -48,10 +52,11 @@ public class GameController : MonoBehaviour
     private void Start()
     {
         santaUnits = GameObject.FindObjectsOfType<SantaUnit>().ToList();
-        houseSlots = GameObject.FindObjectsOfType<HouseSlot>().ToList();
+        befanas = GameObject.FindObjectsOfType<Befana>().ToList();
+        houseSlots = GameObject.FindObjectsOfType<House>().ToList();
         gifts = GameObject.FindObjectsOfType<Gift>().ToList();
 
-        foreach (HouseSlot houseSlot in houseSlots)
+        foreach (House houseSlot in houseSlots)
         {
             //houseSlot.onGiftDelivered += OnGiftDelivered;
         }
@@ -70,11 +75,30 @@ public class GameController : MonoBehaviour
         remainingTime = levelTimeInSecond;
     }
 
+    private bool HasLost()
+    {
+        if (remainingTime < Mathf.Epsilon)
+        {
+            remainingTime = 0;
+            return true;
+        }
+
+        foreach (SantaUnit santaUnit in santaUnits)
+        {
+            if(santaUnit.IsKidnapped() == false)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private bool HasWin()
     {
-        foreach (HouseSlot houseSlot in houseSlots)
+        foreach (House houseSlot in houseSlots)
         {
-            if (houseSlot.IsDelivered() == false)
+            if (houseSlot.IsDeliverComplete() == false)
             {
                 return false;
             }
@@ -99,9 +123,8 @@ public class GameController : MonoBehaviour
         {
             Win();
         }
-        else if (remainingTime < Mathf.Epsilon)
+        else if (HasLost())
         {
-            remainingTime = 0;
             Lost();
         }
         UpdateTimeText();
@@ -142,6 +165,11 @@ public class GameController : MonoBehaviour
     {
         startMenuCanvas.gameObject.SetActive(false);
         gameState = GameState.Playing;
+
+        foreach (Befana befana in befanas)
+        {
+            befana.StartPatrolling();
+        }
     }
 
     private void OnRetryButton()

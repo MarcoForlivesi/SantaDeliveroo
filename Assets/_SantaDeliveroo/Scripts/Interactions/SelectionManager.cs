@@ -25,7 +25,7 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         currentSelection = new List<Transform>();
     }
 
-    private void DeselectAll()
+    private void _DeselectAll()
     {
         currentSelection.Clear();
         List<SantaUnit> santaUnits = GameController.Instance.SantaUnits;
@@ -36,12 +36,18 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         }
     }
 
+    public void DeselectAll()
+    {
+        _DeselectAll();
+        SelectionChange();
+    }
+
     public void OnMouseLeftClickDown()
     {
         List<Transform> lastSelection = new List<Transform>(currentSelection);
         if (Input.GetKey(KeyCode.LeftControl) == false)
         {
-            DeselectAll();
+            _DeselectAll();
         }
 
         Ray raycastVector = Camera.main.ScreenPointToRay(Input.mousePosition);

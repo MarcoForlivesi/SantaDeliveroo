@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PathFollower : MonoBehaviour
 {
+    public event System.Action onPathComplete;
+
     [SerializeField] private LineRenderer pathLine;
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float maxVelocity;
@@ -53,11 +55,6 @@ public class PathFollower : MonoBehaviour
                 velocity = Mathf.Max(velocity, 0);
             }
 
-            if (rigidbody.velocity.magnitude > maxVelocity)
-            {
-                rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
-            }
-
             //rigidbody.Add(pathLine.GetPosition(1));
             transform.position = Vector3.MoveTowards(transform.position, pointTarget, velocity);
         }
@@ -80,6 +77,7 @@ public class PathFollower : MonoBehaviour
         if (pathLine.positionCount < 3)
         {
             pathLine.positionCount = 0;
+            OnPathComplete();
         }
         else
         {
@@ -122,4 +120,11 @@ public class PathFollower : MonoBehaviour
         }
     }
 
+    private void OnPathComplete()
+    {
+        if (onPathComplete != null)
+        {
+            onPathComplete.Invoke();
+        }
+    }
 }

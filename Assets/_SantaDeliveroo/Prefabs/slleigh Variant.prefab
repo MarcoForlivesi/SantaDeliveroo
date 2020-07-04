@@ -42,7 +42,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathLine: {fileID: 6775609103163261242}
-  rotationSpeed: 5
+  rotationSpeed: 1
   maxVelocity: 2
   acceleration: 1
   rotationThreshold: 1

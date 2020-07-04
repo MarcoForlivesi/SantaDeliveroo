@@ -241,7 +241,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private void MoveSelected()
     {
-        Debug.Log($"Add point: { lastPosition } startPosition: { startPosition }");
+        //Debug.Log($"Add point: { lastPosition } startPosition: { startPosition }");
 
         pathList.Add(lastPosition - startPosition);
 

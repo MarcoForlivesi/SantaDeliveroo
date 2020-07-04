@@ -37,6 +37,7 @@ public class InputManager : MonoBehaviour
 
         MoveCommand.Instance.onMoveSelected += (list) =>
         {
+            SelectionManager.Instance.DeselectAll();
             InputManager.Instance.SetCurrentHandler(SelectionManager.Instance);
         };
     }
