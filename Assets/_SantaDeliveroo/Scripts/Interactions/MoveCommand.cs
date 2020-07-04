@@ -11,7 +11,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
     private List<Vector3> pathList;
 
     [SerializeField] private LayerMask layerMask;
-    [SerializeField] private float maxDistance = 1.000f;
     [SerializeField] private float minCircleSize = 300.0f;
     [SerializeField] private float circleScaleFactor = 1.0f;
     [SerializeField] private Image horizontalCircleImage;
@@ -56,7 +55,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
         SelectionManager.Instance.onSelectionChange += () =>
         {
-            Transform targetItem = GetTargetItem();
+            Transform targetItem = SelectionManager.Instance.GetTargetItem();
 
             if (targetItem == null)
             {
@@ -150,17 +149,39 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         Vector3 mousePosition = Input.mousePosition;
         mousePosition.z = circleCenter.z;
         Ray ray = Camera.main.ScreenPointToRay(mousePosition);
-        bool hit = Physics.Raycast(ray, out RaycastHit hitInfo, maxDistance, layerMask);
-        if (hit)
-        {
-            pathLine.gameObject.SetActive(true);
-            lastPosition = hitInfo.point;
-            moveDistance = Vector3.Distance(circleCenter, lastPosition);
-            //Debug.Log($"collide: { hitInfo.collider.name } moveDistance: { moveDistance }");
+        RaycastHit[] hitInfos = Physics.RaycastAll(ray, Mathf.Infinity, layerMask);
 
-            moveDistance = moveDistance * circleScaleFactor;
-            moveDistance = Mathf.Max(moveDistance, minCircleSize);
+        if (hitInfos.Length == 0)
+        {
+            return;
         }
+
+        //Debug.Log($"Hit count: { hitInfos.Length } ");
+
+        Vector3 targetPoint = hitInfos[0].point;
+        foreach (RaycastHit hitInfo in hitInfos)
+        {
+            //Debug.Log($"collide: { hitInfo.collider.name } ");
+
+            if (hitInfo.collider.tag == Tags.Interactable)
+            {
+                IPointInteractable pointInteractable = hitInfo.collider.GetComponentInParent<IPointInteractable>();
+
+                if (pointInteractable != null)
+                {
+                    targetPoint = pointInteractable.GetPoint();
+                    break;
+                }
+            }
+        }
+
+        pathLine.gameObject.SetActive(true);
+        lastPosition = targetPoint;
+        moveDistance = Vector3.Distance(circleCenter, lastPosition);
+        //Debug.Log($"collide: { hitInfo.collider.name } moveDistance: { moveDistance }");
+
+        moveDistance = moveDistance * circleScaleFactor;
+        moveDistance = Mathf.Max(moveDistance, minCircleSize);
     }
 
     private void UpdateHorizontalCircle()
@@ -207,17 +228,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         drawStep = DrawStep.Idle;
     }
 
-    private Transform GetTargetItem()
-    {
-        List<Transform> selectionList = SelectionManager.Instance.CurrentSelection;
-
-        if (selectionList == null || selectionList.Count == 0)
-        {
-            return null;
-        }
-
-        return selectionList[0];
-    }
+    
 
     public void OnMouseLeftClick()
     {

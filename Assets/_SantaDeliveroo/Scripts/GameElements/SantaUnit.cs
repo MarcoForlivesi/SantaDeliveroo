@@ -50,6 +50,7 @@ public class SantaUnit : MonoBehaviour, ISelectable
         {
             if (slot.childCount == 0)
             {
+                gift.SetCollected();
                 gift.transform.SetParent(slot);
                 gift.transform.position = slot.position;
                 return;
@@ -57,16 +58,19 @@ public class SantaUnit : MonoBehaviour, ISelectable
         }
     }
 
-    public void DropGift()
+    public Gift DropGift()
     {
         foreach (Transform slot in slots)
         {
             if (slot.childCount > 0)
             {
                 Gift gift = slot.transform.GetChild(0).GetComponent<Gift>();
+                gift.Drop();
                 gift.transform.position = dropPoint.position;
-                return;
+                return gift;
             }
         }
+
+        return null;
     }
 }

@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_SantaDeliveroo/Scene/Level_1.unity
+    guid: e8d64367e02545c448f07e50d6487f8f
   m_configObjects: {}

@@ -21,7 +21,7 @@ public class PathFollower : MonoBehaviour
     }
 
     // Update is called once per frame
-    void LateUpdate()
+    void Update()
     {
         if (pathLine.positionCount < 2)
         {
@@ -106,12 +106,12 @@ public class PathFollower : MonoBehaviour
         Vector3 start = transform.position;
         pathLine.SetPosition(0, start);
 
-        Debug.Log($"SetPath:");
+        //Debug.Log($"SetPath:");
 
         for (int i = 0; i < pointList.Count; i++)
         {
             pathLine.SetPosition(i + 1, pointList[i] + start);
-            Debug.Log($"{i} : { pointList[i] + start }");
+            //Debug.Log($"{i} : { pointList[i] + start }");
         }
     }
 

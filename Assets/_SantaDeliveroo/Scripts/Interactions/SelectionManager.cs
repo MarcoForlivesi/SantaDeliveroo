@@ -82,4 +82,44 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
             onSelectionChange.Invoke();
         }
     }
+
+    public Transform GetTargetItem()
+    {
+        Vector3 center = Vector3.zero;
+
+        if (currentSelection == null || currentSelection.Count == 0)
+        {
+            return null;
+        }
+
+        foreach (Transform item in currentSelection)
+        {
+            center += item.position;
+        }
+
+        center = center / currentSelection.Count;
+
+        Transform centerItem = null;
+        float minDistance = -1;
+
+        foreach (Transform item in currentSelection)
+        {
+            if (centerItem == null)
+            {
+                minDistance = Vector3.Distance(center, item.position);
+                centerItem = item;
+            }
+            else
+            {
+                float distance = Vector3.Distance(center, item.position);
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    centerItem = item;
+                }
+            }
+        }
+
+        return centerItem;
+    }
 }
