@@ -8,6 +8,7 @@ public class PathFollower : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float maxVelocity;
     [SerializeField] private float acceleration;
+    [SerializeField] private float rotationThreshold = 0.1f;
     [SerializeField] private float pointThreshold = 0.5f;
     [SerializeField] private float pointThresholdDeceleration = 1.0f;
 
@@ -21,7 +22,7 @@ public class PathFollower : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (pathLine.positionCount < 2)
         {
@@ -29,15 +30,15 @@ public class PathFollower : MonoBehaviour
         }
 
         Vector3 pointTarget = pathLine.GetPosition(1);
-
-        bool shouldRotate = false;
+        Vector3 direction = pointTarget - transform.position;
+        bool shouldRotate = Vector3.Angle(direction, transform.forward) > rotationThreshold;
 
         if (shouldRotate)
         {
             velocity = 0;
-            Vector3 direction = pointTarget - transform.position;
+            
             Quaternion newRotation = Quaternion.LookRotation(pointTarget - transform.position);
-            transform.rotation = Quaternion.Slerp(transform.rotation, newRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, rotationSpeed);
         }
         else
         {
@@ -51,7 +52,13 @@ public class PathFollower : MonoBehaviour
                 velocity -= acceleration * Time.deltaTime;
                 velocity = Mathf.Max(velocity, 0);
             }
-            //rigidbody.MovePosition(pathLine.GetPosition(1));
+
+            if (rigidbody.velocity.magnitude > maxVelocity)
+            {
+                rigidbody.velocity = rigidbody.velocity.normalized * maxVelocity;
+            }
+
+            //rigidbody.Add(pathLine.GetPosition(1));
             transform.position = Vector3.MoveTowards(transform.position, pointTarget, velocity);
         }
 

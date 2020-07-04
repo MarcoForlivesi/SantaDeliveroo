@@ -42,9 +42,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pathLine: {fileID: 6775609103163261242}
-  rotationSpeed: 0
+  rotationSpeed: 5
   maxVelocity: 2
-  acceleration: 0.01
+  acceleration: 1
+  rotationThreshold: 1
   pointThreshold: 0.5
   pointThresholdDeceleration: 1
 --- !u!114 &6488128968595215394
@@ -2815,7 +2816,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 479674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.7071069
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 479674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
       propertyPath: m_LocalRotation.y
@@ -2823,11 +2824,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 479674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 479674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.70710677
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 479674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
       propertyPath: m_RootOrder
@@ -2869,7 +2870,14 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[1]
       value: 
       objectReference: {fileID: 2100000, guid: a104b87508ce003499b14e25144f6850, type: 2}
-    m_RemovedComponents: []
+    - target: {fileID: 578546877025273652, guid: f9bd47891fe00684084c267c8afa74ce,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 3379674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
+    - {fileID: 2379674, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: f9bd47891fe00684084c267c8afa74ce, type: 3}
 --- !u!1 &1272798944954614753 stripped
 GameObject:
