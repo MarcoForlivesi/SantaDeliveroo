@@ -17,10 +17,12 @@ public class Befana : MonoBehaviour
 
     private List<Vector3> path;
     private bool reverse;
+    private bool kidnap;
 
     private void Start()
     {
         reverse = true;
+        kidnap = false;
 
         path = new List<Vector3>();
         for (int i = 0; i < lineRenderer.positionCount; i++)
@@ -84,7 +86,7 @@ public class Befana : MonoBehaviour
     private void OnInfluenceExit(Collider other)
     {
         SantaUnit santaUnit = other.GetComponent<SantaUnit>();
-        if (santaUnit ==  null)
+        if (santaUnit ==  null || kidnap)
         {
             return;
         }
@@ -108,11 +110,9 @@ public class Befana : MonoBehaviour
         pathFollower.SetPath(path);
         pathFollower.enabled = true;
         chase.enabled = false;
+        kidnap = true;
 
         santaUnit.Kidnapped(this);
         SelectionManager.Instance.Deselect(santaUnit.transform);
-
-        //Destroy(gameObject);
-        //Destroy(santaUnit.gameObject);
     }
 }

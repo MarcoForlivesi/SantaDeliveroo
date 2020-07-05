@@ -237,9 +237,8 @@ public class GameController : MonoBehaviour
             if (SelectionManager.GetSelectionType() == SelectableType.Santa)
             {
                 commandUI.Show();
+                CameraController.Instance.OrbitCamera.SetTarget(targetItem);
             }
-
-            CameraController.Instance.OrbitCamera.SetTarget(targetItem);
 
             if (currentSelection.Count == 1)
             {

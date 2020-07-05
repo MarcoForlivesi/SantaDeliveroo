@@ -19,9 +19,11 @@ public class CameraController : MonoBehaviour
     private bool isTacticalView;
     private bool isSwitching;
 
+    private float targetFoV;
     private Vector3 targetPosition;
     private Vector3 targetDirection;
 
+    private float prevFoV;
     private Vector3 prevPosition;
     private Vector3 prevDirection;
 
@@ -50,6 +52,7 @@ public class CameraController : MonoBehaviour
                 orbitCamera.enabled = true;
                 tacticalViewCamera.enabled = false;
 
+                targetFoV = prevFoV;
                 targetPosition = prevPosition;
                 targetDirection = prevDirection;
             }
@@ -58,9 +61,11 @@ public class CameraController : MonoBehaviour
                 orbitCamera.enabled = false;
                 tacticalViewCamera.enabled = true;
 
+                targetFoV = tacticalViewCamera.Camera.fieldOfView;
                 targetPosition = tacticalViewCamera.transform.position;
                 targetDirection = tacticalViewCamera.transform.forward;
 
+                prevFoV = orbitCamera.Camera.fieldOfView;
                 prevPosition = orbitCamera.transform.position;
                 prevDirection = orbitCamera.transform.forward;
             }
@@ -86,6 +91,8 @@ public class CameraController : MonoBehaviour
         cameraMain.transform.rotation = Quaternion.Slerp(cameraMain.transform.rotation,
             Quaternion.LookRotation(targetDirection),
             switchTime * Time.deltaTime);
+
+        cameraMain.fieldOfView = Mathf.Lerp(cameraMain.fieldOfView, targetFoV, Time.deltaTime * switchTime);
 
         isSwitching = Vector3.Distance(cameraMain.transform.position, targetPosition) > positionThreshold ||
             Vector3.Angle(cameraMain.transform.forward, targetDirection) > rotationThreshold;

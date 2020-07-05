@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class TacticalViewCamera : MonoBehaviour
 {
+    public Camera Camera => cameraReference;
     [SerializeField] private Camera cameraReference;
     
 

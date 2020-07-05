@@ -133,6 +133,8 @@ public class SantaUnit : MonoBehaviour, ISelectable
 
         Chase chase = gameObject.AddComponent<Chase>();
         chase.movementData = pathFollower.movementData;
+        pathFollower.enabled = false;
+        pathFollower.SetPath(new List<Vector3>());
         chase.SetTarget(befana.transform);
     }
 

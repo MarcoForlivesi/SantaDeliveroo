@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OrbitCamera : MonoBehaviour, IMouseHandler
 {
+    public Camera Camera => Camera.main;
+
     [SerializeField] private Transform target;
     [Range(1f, 20f)]
     [SerializeField] float distance = 5f;
