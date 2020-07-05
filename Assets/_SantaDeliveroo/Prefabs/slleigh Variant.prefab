@@ -27,8 +27,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 3.2155595, y: 1.6534034, z: 2.0536704}
-  m_Center: {x: 0.16215473, y: 0, z: 0.38811627}
+  m_Size: {x: 2.05367, y: 1.93, z: 3.215559}
+  m_Center: {x: 0.16215473, y: 0.38, z: -0.29}
 --- !u!114 &3680751908384349805
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2419,6 +2419,7 @@ MonoBehaviour:
   - {fileID: 7214941871304204284}
   - {fileID: 9018506246329145871}
   dropPoint: {fileID: 5962224009890563424}
+  dropTime: 0.5
 --- !u!1 &1750653935591965547
 GameObject:
   m_ObjectHideFlags: 0

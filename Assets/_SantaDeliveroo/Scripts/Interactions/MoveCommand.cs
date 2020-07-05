@@ -77,9 +77,9 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         switch (drawStep)
         {
             case DrawStep.DrawingHorizontalCircle:
-            //    StartDrawingVerticalDistance();
-            //    break;
-            //case DrawStep.DrawingVerticalDistance:
+                StartDrawingVerticalDistance();
+                break;
+            case DrawStep.DrawingVerticalDistance:
                 MoveSelected();
                 break;
             default:
@@ -126,8 +126,9 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         verticalDistanceImage.gameObject.SetActive(true);
 
         Vector3 circleVector = lastHorizontalPosition - circleCenter;
-        float angle = Vector3.SignedAngle(circleVector, Camera.main.transform.forward, Vector3.up);
-        verticalDistanceImage.transform.rotation = Quaternion.AngleAxis(angle + 90, Vector3.up);
+        float angle = Vector3.Angle(circleVector, Camera.main.transform.right);
+
+        verticalDistanceImage.transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
 
     private void UpdateData()
@@ -141,7 +142,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         {
             return;
         }
-
         //Debug.Log($"Hit count: { hitInfos.Length } ");
 
         Vector3 targetPoint = hitInfos[0].point;
@@ -194,12 +194,17 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         verticalDistanceImage.fillClockwise = clockwise;
         verticalDistanceImage.fillOrigin = angleAbs < 90 ? 1 : 3;
         verticalDistanceImage.fillAmount = angle90Abs / 360.0f;
-        Debug.Log($"angle: { angle } angleAbs: { angleAbs } angle90Abs: {angle90Abs} fillAmount: { verticalDistanceImage.fillAmount }");
+        //Debug.Log($"angle: { angle } angleAbs: { angleAbs } angle90Abs: {angle90Abs} fillAmount: { verticalDistanceImage.fillAmount }");
 
-        float lenght = Mathf.Tan(angle90Abs * Mathf.Deg2Rad) * circleVector.magnitude;
+        float height = Mathf.Tan(angle90Abs * Mathf.Deg2Rad) * circleVector.magnitude;
+        Vector3 lastVerticalPosition = lastHorizontalPosition + height * Vector3.up;
 
-        lastVerticalPosition = circleCenter + veticalVector.normalized * lenght;
-        Debug.Log($"veticalVector: { veticalVector } lenght: { lenght } veticalVector.normalized: { veticalVector.normalized } lastVerticalPosition: { lastVerticalPosition } lastPosition: { lastPosition }");
+        //lastVerticalPosition = circleCenter + veticalVector.normalized * height;
+        Debug.Log($"angle90Abs: {angle90Abs} tan: { Mathf.Tan(angle90Abs * Mathf.Deg2Rad) }");
+        Debug.Log($"lenght: { height } circleVector.magnitude: {circleVector.magnitude}");
+        Debug.Log($" veticalVector: { veticalVector } veticalVector.normalized: { veticalVector.normalized }");
+        Debug.Log($" lastHorizontalPosition: { lastHorizontalPosition }");
+        Debug.Log($"lastVerticalPosition: { lastVerticalPosition } lastPosition: { lastPosition }");
 
         pathLine.SetPosition(pathLine.positionCount - 1, lastVerticalPosition);
     }
