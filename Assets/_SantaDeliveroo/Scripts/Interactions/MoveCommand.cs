@@ -76,9 +76,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
     {
         switch (drawStep)
         {
-            case DrawStep.Idle:
-                StartDrawingCircle();
-                break;
             case DrawStep.DrawingHorizontalCircle:
             //    StartDrawingVerticalDistance();
             //    break;
@@ -93,6 +90,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
     public void SetStartPosition(Vector3 position)
     {
         startPosition = position;
+        StartDrawingCircle();
     }
 
     private void StartDrawingCircle()
