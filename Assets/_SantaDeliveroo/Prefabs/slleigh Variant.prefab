@@ -41,7 +41,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df827e5773a3a034e9381d2d06f12ee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementData: {fileID: 5346899859088277972}
   pathLine: {fileID: 6775609103163261242}
+--- !u!114 &5346899859088277972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1272798944954614753}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fdcc82c25e898e42ab67f25f388f520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   rotationSpeed: 1
   maxVelocity: 2
   acceleration: 1

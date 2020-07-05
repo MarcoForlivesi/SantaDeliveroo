@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Befana : MonoBehaviour
 {
+    public PathFollower PathFollower => pathFollower;
+
     [SerializeField] private LineRenderer lineRenderer;
     [SerializeField] private bool pingPong;
     [Header("Movement")]
@@ -104,8 +106,10 @@ public class Befana : MonoBehaviour
         Vector3 honolulu = GameController.Instance.Honolulu.position;
         path.Add(honolulu);
         pathFollower.SetPath(path);
+        pathFollower.enabled = true;
+        chase.enabled = false;
 
-        santaUnit.Kidnapped();
+        santaUnit.Kidnapped(this);
         SelectionManager.Instance.Deselect(santaUnit.transform);
 
         //Destroy(gameObject);

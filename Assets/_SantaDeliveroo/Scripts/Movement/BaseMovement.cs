@@ -4,12 +4,7 @@ using UnityEngine;
 
 public class BaseMovement : MonoBehaviour
 {
-    [SerializeField] private float rotationSpeed;
-    [SerializeField] private float maxVelocity;
-    [SerializeField] private float acceleration;
-    [SerializeField] private float rotationThreshold = 0.1f;
-    [SerializeField] private float pointThreshold = 0.5f;
-    [SerializeField] private float pointThresholdDeceleration = 1.0f;
+    public MovementData movementData;
 
     private Rigidbody rigidbody;
     private float velocity;
@@ -24,25 +19,25 @@ public class BaseMovement : MonoBehaviour
     protected void MoveTowards(Vector3 pointTarget)
     {
         Vector3 direction = pointTarget - transform.position;
-        bool shouldRotate = Vector3.Angle(direction, transform.forward) > rotationThreshold;
+        bool shouldRotate = Vector3.Angle(direction, transform.forward) > movementData.rotationThreshold;
 
         if (shouldRotate)
         {
             velocity = 0;
 
             Quaternion newRotation = Quaternion.LookRotation(pointTarget - transform.position);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, rotationSpeed);
+            transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, movementData.rotationSpeed);
         }
         else
         {
-            if (Vector3.Distance(transform.position, pointTarget) > pointThresholdDeceleration)
+            if (Vector3.Distance(transform.position, pointTarget) > movementData.pointThresholdDeceleration)
             {
-                velocity += acceleration * Time.deltaTime;
-                velocity = Mathf.Min(velocity, maxVelocity);
+                velocity += movementData.acceleration * Time.deltaTime;
+                velocity = Mathf.Min(velocity, movementData.maxVelocity);
             }
             else
             {
-                velocity -= acceleration * Time.deltaTime;
+                velocity -= movementData.acceleration * Time.deltaTime;
                 velocity = Mathf.Max(velocity, 0);
             }
 

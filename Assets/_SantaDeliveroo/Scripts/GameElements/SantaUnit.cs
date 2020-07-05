@@ -120,19 +120,20 @@ public class SantaUnit : MonoBehaviour, ISelectable
         isSelectable = true;
     }
 
-    public void Kidnapped()
+    public void Kidnapped(Befana befana)
     {
         isKidnapped = true;
         Select(false);
         List<Vector3> path = new List<Vector3>();
-        Vector3 honolulu = GameController.Instance.Honolulu.position;
-        path.Add(honolulu);
-        pathFollower.SetPath(path);
 
         if (onKidnapped != null)
         {
             onKidnapped.Invoke(this);
         }
+
+        Chase chase = gameObject.AddComponent<Chase>();
+        chase.movementData = pathFollower.movementData;
+        chase.SetTarget(befana.transform);
     }
 
     public bool IsKidnapped()

@@ -24,10 +24,10 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private enum DrawStep
     {
-        Idle,
-        DrawingHorizontalCircle,
-        DrawingVerticalDistance,
-        DrawToHotspot,
+        Idle = 0,
+        DrawingHorizontalCircle = 1,
+        DrawingVerticalDistance = 2,
+        DrawToHotspot = 4,
     }
 
     private DrawStep drawStep;
@@ -92,6 +92,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
                 StartDrawingVerticalDistance();
                 break;
             case DrawStep.DrawingVerticalDistance:
+            case DrawStep.DrawToHotspot:
                 MoveSelected();
                 break;
             default:
@@ -119,6 +120,8 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         horizontalCircleImage.transform.localScale = new Vector3(minCircleSize, minCircleSize, 1);
         horizontalCircleCollider.enabled = true;
         horizontalCircleImage.gameObject.SetActive(true);
+
+        verticalDistanceImage.gameObject.SetActive(false);
 
         drawStep = DrawStep.DrawingHorizontalCircle;
 

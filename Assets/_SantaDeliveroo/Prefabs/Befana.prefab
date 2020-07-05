@@ -242,6 +242,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5658936499240739282}
   - component: {fileID: 8393169113190116860}
+  - component: {fileID: 6123075852522963215}
   - component: {fileID: 3779926965284172880}
   - component: {fileID: 3039674594278472619}
   m_Layer: 0
@@ -282,10 +283,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   lineRenderer: {fileID: 6555918798515111599}
   pingPong: 0
-  chase: {fileID: 0}
+  chase: {fileID: 3039674594278472619}
   pathFollower: {fileID: 3779926965284172880}
   influeceTrigger: {fileID: 1026672548195924407}
   triggerAction: {fileID: 2291752790463785513}
+--- !u!114 &6123075852522963215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3370328299578359813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8fdcc82c25e898e42ab67f25f388f520, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotationSpeed: 1
+  maxVelocity: 2.2
+  acceleration: 1
+  rotationThreshold: 1
+  pointThreshold: 0.5
+  pointThresholdDeceleration: 1
 --- !u!114 &3779926965284172880
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -298,13 +317,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df827e5773a3a034e9381d2d06f12ee2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movementData: {fileID: 6123075852522963215}
   pathLine: {fileID: 6555918798515111599}
-  rotationSpeed: 1
-  maxVelocity: 2.2
-  acceleration: 1
-  rotationThreshold: 1
-  pointThreshold: 0.5
-  pointThresholdDeceleration: 1
 --- !u!114 &3039674594278472619
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -317,12 +331,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1218a1a097c11ee4b8fd565d4066b53e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rotationSpeed: 1
-  maxVelocity: 2.2
-  acceleration: 1
-  rotationThreshold: 1
-  pointThreshold: 0.5
-  pointThresholdDeceleration: 1
+  movementData: {fileID: 6123075852522963215}
 --- !u!1 &8982416321771932011
 GameObject:
   m_ObjectHideFlags: 0

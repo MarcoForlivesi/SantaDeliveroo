@@ -2,17 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PathFollower : MonoBehaviour
+public class PathFollower : BaseMovement
 {
     public event System.Action onPathComplete;
 
     [SerializeField] private LineRenderer pathLine;
-    [SerializeField] private float rotationSpeed;
-    [SerializeField] private float maxVelocity;
-    [SerializeField] private float acceleration;
-    [SerializeField] private float rotationThreshold = 0.1f;
-    [SerializeField] private float pointThreshold = 0.5f;
-    [SerializeField] private float pointThresholdDeceleration = 1.0f;
 
     private Rigidbody rigidbody;
     private float velocity;
@@ -32,34 +26,9 @@ public class PathFollower : MonoBehaviour
         }
 
         Vector3 pointTarget = pathLine.GetPosition(1);
-        Vector3 direction = pointTarget - transform.position;
-        bool shouldRotate = Vector3.Angle(direction, transform.forward) > rotationThreshold;
+        MoveTowards(pointTarget);
 
-        if (shouldRotate)
-        {
-            velocity = 0;
-            
-            Quaternion newRotation = Quaternion.LookRotation(pointTarget - transform.position);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, rotationSpeed);
-        }
-        else
-        {
-            if (Vector3.Distance(transform.position, pointTarget) > pointThresholdDeceleration)
-            {
-                velocity += acceleration * Time.deltaTime;
-                velocity = Mathf.Min(velocity, maxVelocity);
-            }
-            else
-            {
-                velocity -= acceleration * Time.deltaTime;
-                velocity = Mathf.Max(velocity, 0);
-            }
-
-            //rigidbody.Add(pathLine.GetPosition(1));
-            transform.position = Vector3.MoveTowards(transform.position, pointTarget, velocity);
-        }
-
-        if (Vector3.Distance(transform.position, pointTarget) < pointThreshold)
+        if (Vector3.Distance(transform.position, pointTarget) < movementData.pointThreshold)
         {
             PointReached();
         }
