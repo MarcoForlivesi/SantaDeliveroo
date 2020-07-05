@@ -27,11 +27,13 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         Idle,
         DrawingHorizontalCircle,
         DrawingVerticalDistance,
+        DrawToHotspot,
     }
 
     private DrawStep drawStep;
     private Vector3 startPosition;
     private Vector3 circleCenter;
+    private Vector3 lastMousePos;
     private Vector3 lastPosition;
     private Vector3 lastHorizontalPosition;
     private Vector3 lastVerticalPosition;
@@ -56,7 +58,13 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private void Update()
     {
-        switch(drawStep)
+        if (Vector3.Distance(lastMousePos, Input.mousePosition) < Mathf.Epsilon)
+        {
+            return;
+        }
+        lastMousePos = Input.mousePosition;
+
+        switch (drawStep)
         {
             case DrawStep.DrawingHorizontalCircle:
                 UpdateData();
@@ -65,6 +73,10 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
             case DrawStep.DrawingVerticalDistance:
                 UpdateData();
                 UpdateVerticalDistance();
+                break;
+            case DrawStep.DrawToHotspot:
+                UpdateData();
+                DrawToHotspot();
                 break;
             default:
                 break;
@@ -132,35 +144,11 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
     private void UpdateData()
     {
-        Vector3 mousePosition = Input.mousePosition;
-        //mousePosition.z = circleCenter.z;
-        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
-        RaycastHit[] hitInfos = Physics.RaycastAll(ray, Mathf.Infinity, layerMask);
-
-        if (hitInfos.Length == 0)
+        bool found = FindTargetPoint(out Vector3 targetPoint);
+        if (found == false)
         {
             return;
         }
-        //Debug.Log($"Hit count: { hitInfos.Length } ");
-        //Debug.Log($"circleCenter: { circleCenter }");
-
-        Vector3 targetPoint = hitInfos[0].point;
-        foreach (RaycastHit hitInfo in hitInfos)
-        {
-            //Debug.Log($"collide: { hitInfo.collider.name } point: { hitInfo.point }");
-
-            if (hitInfo.collider.tag == Tags.Interactable)
-            {
-                IPointInteractable pointInteractable = hitInfo.collider.GetComponentInParent<IPointInteractable>();
-
-                if (pointInteractable != null)
-                {
-                    targetPoint = pointInteractable.GetPoint();
-                    break;
-                }
-            }
-        }
-
         //Debug.Log($"targetPoint: { targetPoint }");
 
         pathLine.gameObject.SetActive(true);
@@ -172,13 +160,70 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         moveDistance = Mathf.Max(moveDistance, minCircleSize);
     }
 
+    private bool FindTargetPoint(out Vector3 targetPoint)
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        //mousePosition.z = circleCenter.z;
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+        RaycastHit[] hitInfos = Physics.RaycastAll(ray, Mathf.Infinity, layerMask);
+
+        if (hitInfos.Length == 0)
+        {
+            targetPoint = Vector3.zero;
+            return false;
+        }
+        //Debug.Log($"Hit count: { hitInfos.Length } ");
+        //Debug.Log($"circleCenter: { circleCenter }");
+
+        bool chooseInteractable = false;
+        if (drawStep != DrawStep.DrawingVerticalDistance)
+        {
+            chooseInteractable = true;
+            drawStep = DrawStep.DrawingHorizontalCircle;
+        }
+
+        targetPoint = hitInfos[0].point;
+        foreach (RaycastHit hitInfo in hitInfos)
+        {
+            //Debug.Log($"collide: { hitInfo.collider.name } point: { hitInfo.point }");
+            if (chooseInteractable && hitInfo.collider.tag == Tags.Interactable)
+            {
+                IPointInteractable pointInteractable = hitInfo.collider.GetComponentInParent<IPointInteractable>();
+
+                if (pointInteractable != null)
+                {
+                    targetPoint = pointInteractable.GetPoint();
+                    drawStep = DrawStep.DrawToHotspot;
+
+                    break;
+                }
+            }
+            else
+            {
+                if (hitInfo.collider.tag != Tags.Interactable)
+                {
+                    targetPoint = hitInfo.point;
+                }
+            }
+        }
+
+        return true;
+    }
+
     private void UpdateHorizontalCircle()
     {
+        horizontalCircleImage.enabled = true;
         horizontalCircleImage.transform.localScale = new Vector3(moveDistance, moveDistance, 1);
         lastHorizontalPosition = lastPosition;
         pathLine.SetPosition(pathLine.positionCount - 1, lastPosition);
 
         //Debug.Log($"Horizontal Click on: { lastPosition }");
+    }
+
+    private void DrawToHotspot()
+    {
+        horizontalCircleImage.enabled = false;
+        pathLine.SetPosition(pathLine.positionCount - 1, lastPosition);
     }
 
     private void UpdateVerticalDistance()
