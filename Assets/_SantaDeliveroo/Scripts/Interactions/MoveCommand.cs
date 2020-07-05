@@ -110,7 +110,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
         drawStep = DrawStep.DrawingHorizontalCircle;
 
-        
         Utils.AddPosition(pathLine, lastPosition);
     }
 
@@ -126,7 +125,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         verticalDistanceImage.gameObject.SetActive(true);
 
         Vector3 circleVector = lastHorizontalPosition - circleCenter;
-        float angle = Vector3.Angle(circleVector, Vector3.right);
+        float angle = Vector3.Angle(circleVector, Vector3.right) * Mathf.Sign(-circleVector.z);
 
         verticalDistanceImage.transform.rotation = Quaternion.AngleAxis(angle, Vector3.up);
     }
@@ -143,7 +142,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
             return;
         }
         //Debug.Log($"Hit count: { hitInfos.Length } ");
-
         //Debug.Log($"circleCenter: { circleCenter }");
 
         Vector3 targetPoint = hitInfos[0].point;
@@ -198,9 +196,10 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         //verticalDistanceImage.fillClockwise = clockwise;
         verticalDistanceImage.fillOrigin = angleAbs < 90 ? 1 : 3;
         verticalDistanceImage.fillAmount = angle90Abs / 360.0f;
-        Debug.Log($"angle: { angle } angleAbs: { angleAbs } angle90Abs: {angle90Abs} fillAmount: { verticalDistanceImage.fillAmount }");
+        //Debug.Log($"angle: { angle } angleAbs: { angleAbs } angle90Abs: {angle90Abs} fillAmount: { verticalDistanceImage.fillAmount }");
 
         float height = Mathf.Tan(angle * Mathf.Deg2Rad) * circleVector.magnitude;
+        //Debug.Log($" veticalVector: { verticalVector } veticalVector.normalized: { verticalVector.normalized }");
         //Debug.Log($"height: { height } circleVector.magnitude: {circleVector.magnitude}");
 
         Vector3 lastVerticalPosition = lastHorizontalPosition + height * Vector3.up;
@@ -219,7 +218,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         verticalDistanceImage.transform.localScale = localScale;
 
         //Debug.Log($"angle90Abs: {angle90Abs} tan: { Mathf.Tan(angle90Abs * Mathf.Deg2Rad) }");
-        Debug.Log($" veticalVector: { verticalVector } veticalVector.normalized: { verticalVector.normalized }");
         //Debug.Log($"circleCenter: { circleCenter }");
         //Debug.Log($"lastHorizontalPosition: { lastHorizontalPosition }");
         //Debug.Log($"lastVerticalPosition: { lastVerticalPosition } lastPosition: { lastPosition }");
