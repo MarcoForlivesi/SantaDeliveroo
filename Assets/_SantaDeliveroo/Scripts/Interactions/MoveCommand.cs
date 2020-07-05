@@ -52,18 +52,6 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
 
         horizontalCircleCollider = horizontalCircleImage.GetComponent<Collider>();
         verticalDistanceCollider = verticalDistanceImage.GetComponent<Collider>();
-
-        SelectionManager.Instance.onSelectionChange += () =>
-        {
-            Transform targetItem = SelectionManager.Instance.GetTargetItem();
-
-            if (targetItem == null)
-            {
-                return;
-            }
-
-            SetStartPosition(targetItem.position);
-        };
     }
 
     private void Update()
@@ -102,7 +90,7 @@ public class MoveCommand : MonoBehaviour, IMouseHandler
         }
     }
 
-    private void SetStartPosition(Vector3 position)
+    public void SetStartPosition(Vector3 position)
     {
         startPosition = position;
     }

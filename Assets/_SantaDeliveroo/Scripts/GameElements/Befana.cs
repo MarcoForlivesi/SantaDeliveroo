@@ -106,6 +106,7 @@ public class Befana : MonoBehaviour
         pathFollower.SetPath(path);
 
         santaUnit.Kidnapped();
+        SelectionManager.Instance.Deselect(santaUnit.transform);
 
         //Destroy(gameObject);
         //Destroy(santaUnit.gameObject);

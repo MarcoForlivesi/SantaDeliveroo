@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class SantaUnit : MonoBehaviour, ISelectable
 {
+    public event System.Action<SantaUnit, Gift> onGiftsCollected;
+    public event System.Action<List<Gift>> onGiftsDelivered;
+    public event System.Action<SantaUnit> onKidnapped;
+
     public PathFollower PathFollower => pathFollower;
 
     [Header("Outline")]
@@ -29,7 +33,7 @@ public class SantaUnit : MonoBehaviour, ISelectable
 
     public void Select(bool value)
     {
-        if (isKidnapped || isSelectable == false)
+        if (isSelectable == false)
         {
             isSelected = false;
             return;
@@ -64,6 +68,12 @@ public class SantaUnit : MonoBehaviour, ISelectable
                 gift.transform.SetParent(slot);
                 gift.transform.position = slot.position;
                 collectedGifts.Add(gift);
+
+                if (onGiftsCollected != null)
+                {
+                    onGiftsCollected.Invoke(this, gift);
+                }
+
                 return;
             }
         }
@@ -87,6 +97,11 @@ public class SantaUnit : MonoBehaviour, ISelectable
             }
         }
 
+        if (onGiftsDelivered != null)
+        {
+            onGiftsDelivered.Invoke(giftsFulfilled);
+        }
+
         StartCoroutine(GiftDropCoroutine(giftsFulfilled));
 
         return giftsFulfilled;
@@ -107,11 +122,17 @@ public class SantaUnit : MonoBehaviour, ISelectable
 
     public void Kidnapped()
     {
+        isKidnapped = true;
         Select(false);
         List<Vector3> path = new List<Vector3>();
         Vector3 honolulu = GameController.Instance.Honolulu.position;
         path.Add(honolulu);
         pathFollower.SetPath(path);
+
+        if (onKidnapped != null)
+        {
+            onKidnapped.Invoke(this);
+        }
     }
 
     public bool IsKidnapped()

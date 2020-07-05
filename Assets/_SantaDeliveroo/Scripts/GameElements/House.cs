@@ -4,14 +4,13 @@ using UnityEngine;
 
 public class House : MonoBehaviour, IPointInteractable, ISelectable
 {
-    public event System.Action<House> onGiftDelivered;
-
     [SerializeField] private Transform hint;
     [SerializeField] private Transform dropPosition;
     [SerializeField] private OnTriggerAction onDropAreaAction;
     [SerializeField] private OnTriggerAction onGroundAreaAction;
     [Header("Gifts")]
     [SerializeField] private List<GiftType> giftRequests;
+
 
     private bool isSelected;
 
@@ -36,13 +35,11 @@ public class House : MonoBehaviour, IPointInteractable, ISelectable
 
     }
 
-    private void GiftDelivered()
+    private void GiftDelivered(List<Gift> deliveredGifts)
     {
-        
-
-        if (onGiftDelivered != null)
+        foreach (Gift gift in deliveredGifts)
         {
-            onGiftDelivered.Invoke(this);
+            giftRequests.Remove(gift.Type);
         }
     }
 
@@ -51,15 +48,10 @@ public class House : MonoBehaviour, IPointInteractable, ISelectable
         SantaUnit santaUnit = collider.GetComponent<SantaUnit>();
         if (santaUnit != null)
         {
-            List<Gift> gifts = santaUnit.DropGift(giftRequests);
+            List<Gift> deliveredGifts = santaUnit.DropGift(giftRequests);
 
-            foreach (Gift gift in gifts)
-            {
-                giftRequests.Remove(gift.Type);
-            }
+            GiftDelivered(deliveredGifts);
         }
-
-        GiftDelivered();
     }
 
     private void OnGroundAreaEnter(Collider collider)
@@ -67,7 +59,10 @@ public class House : MonoBehaviour, IPointInteractable, ISelectable
         Gift gift = collider.GetComponent<Gift>();
         if (gift != null)
         {
-            hint.gameObject.SetActive(false);
+            if (giftRequests.Count == 0)
+            {
+                hint.gameObject.SetActive(false);
+            }
         }
 
         OnDeliverComplete();

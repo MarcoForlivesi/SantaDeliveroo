@@ -16,9 +16,13 @@ public class GameController : MonoBehaviour
     public List<House> HouseSlots => houseSlots;
     public List<Gift> Gifts => gifts;
     public Transform Honolulu => honolulu;
+    public int DeliveredGiftToWin => deliveredGiftsToWin;
+    public SelectionManager SelectionManager => SelectionManager.Instance;
+    public MoveCommand MoveCommand => MoveCommand.Instance;
 
     [SerializeField] private Transform honolulu;
     [SerializeField] private float levelTimeInSecond;
+    [SerializeField] private int deliveredGiftsToWin;
     [Header("UI - MenuStart")]
     [SerializeField] private Canvas startMenuCanvas;
     [SerializeField] private Button playButton;
@@ -28,9 +32,12 @@ public class GameController : MonoBehaviour
     [Header("UI - Win")]
     [SerializeField] private Canvas winCanvas;
     [SerializeField] private Button nextButton;
-    [Header("UI - Win")]
+    [Header("UI - Game")]
     //[SerializeField] private Canvas timeCanvas;
     [SerializeField] private TextMeshProUGUI timeText;
+    [SerializeField] private GameInfoUI gameInfoUI;
+    [SerializeField] private GiftSelectionUI giftSelectionUI;
+    [SerializeField] private CommandUI commandUI;
 
     private static GameController instance;
     private GameState gameState;
@@ -56,12 +63,10 @@ public class GameController : MonoBehaviour
         houseSlots = GameObject.FindObjectsOfType<House>().ToList();
         gifts = GameObject.FindObjectsOfType<Gift>().ToList();
 
-        foreach (House houseSlot in houseSlots)
-        {
-            //houseSlot.onGiftDelivered += OnGiftDelivered;
-        }
-
-        MoveCommand.Instance.onMoveSelected += OnMoveCommand;
+        gameInfoUI.UpdateGiftLeft(deliveredGiftsToWin);
+        gameInfoUI.UpdateSantaUnitLeft(santaUnits.Count);
+        giftSelectionUI.Hide();
+        commandUI.Hide();
 
         startMenuCanvas.gameObject.SetActive(true);
         lostCanvas.gameObject.SetActive(false);
@@ -73,6 +78,19 @@ public class GameController : MonoBehaviour
         nextButton.onClick.AddListener(OnNextButton);
 
         remainingTime = levelTimeInSecond;
+    }
+
+    private void EnableGameEvent()
+    {
+        foreach (SantaUnit santaUnit in santaUnits)
+        {
+            santaUnit.onGiftsCollected += OnGiftCollected;
+            santaUnit.onGiftsDelivered += OnGifstDelivered;
+            santaUnit.onKidnapped += OnKidnapped;
+        }
+
+        MoveCommand.Instance.onMoveSelected += OnMoveCommand;
+        SelectionManager.Instance.onSelectionChange += OnSelectionChange;
     }
 
     private bool HasLost()
@@ -96,15 +114,12 @@ public class GameController : MonoBehaviour
 
     private bool HasWin()
     {
-        foreach (House houseSlot in houseSlots)
+        if (deliveredGiftsToWin == 0)
         {
-            if (houseSlot.IsDeliverComplete() == false)
-            {
-                return false;
-            }
+            return true;
         }
 
-        return true;
+        return false;
     }
 
     private void Update()
@@ -147,20 +162,7 @@ public class GameController : MonoBehaviour
         timeText.text = String.Format("{0}:{1}", minutes, seconds);
     }
 
-    private void OnMoveCommand(List<Vector3> path)
-    {
-        List<Transform> selectedUnit = SelectionManager.Instance.CurrentSelection;
-
-        foreach (Transform selectedTransform in selectedUnit)
-        {
-            PathFollower pathFollower = selectedTransform.GetComponent<PathFollower>();
-            if (pathFollower != null)
-            {
-                pathFollower.SetPath(path);
-            }
-        }
-    }
-
+    #region EVENTS
     private void OnPlayButton()
     {
         startMenuCanvas.gameObject.SetActive(false);
@@ -170,6 +172,8 @@ public class GameController : MonoBehaviour
         {
             befana.StartPatrolling();
         }
+
+        EnableGameEvent();
     }
 
     private void OnRetryButton()
@@ -187,4 +191,98 @@ public class GameController : MonoBehaviour
             SceneManager.LoadScene(currentScene.buildIndex + 1, LoadSceneMode.Single);
         }
     }
+
+    private void OnGiftCollected(SantaUnit santaUnit, Gift gift)
+    {
+        ISelectable selectable = santaUnit.GetComponent<ISelectable>();
+        giftSelectionUI.SetSelectable(selectable);
+    }
+
+    private void OnGifstDelivered(List<Gift> deliveredGifts)
+    {
+        deliveredGiftsToWin -= deliveredGifts.Count;
+
+        deliveredGiftsToWin = Mathf.Max(0, deliveredGiftsToWin);
+
+        gameInfoUI.UpdateGiftLeft(deliveredGiftsToWin);
+    }
+
+    private void OnKidnapped(SantaUnit santaUnit)
+    {
+        CameraController.Instance.OrbitCamera.SetTarget(null);
+
+        int santaLeft = 0;
+        foreach (SantaUnit item in santaUnits)
+        {
+            if (item.IsKidnapped() == false)
+            {
+                santaLeft++;
+            }
+        }
+        gameInfoUI.UpdateSantaUnitLeft(santaLeft);
+    }
+
+    private void OnSelectionChange()
+    {
+        List<Transform> currentSelection = SelectionManager.CurrentSelection;
+
+        if (currentSelection.Count > 0)
+        {
+            Transform targetItem = SelectionManager.GetTargetItem();
+            if (targetItem == null)
+            {
+                return;
+            }
+
+            if (SelectionManager.GetSelectionType() == SelectableType.Santa)
+            {
+                commandUI.Show();
+            }
+
+            CameraController.Instance.OrbitCamera.SetTarget(targetItem);
+
+            if (currentSelection.Count == 1)
+            {
+                ISelectable selectable = currentSelection[0].GetComponent<ISelectable>();
+                giftSelectionUI.SetSelectable(selectable);
+                giftSelectionUI.Show();
+            }
+        }
+        else
+        {
+            commandUI.Hide();
+            giftSelectionUI.Hide();
+        }
+    }
+
+
+    private void OnMoveCommand(List<Vector3> path)
+    {
+        InputManager.Instance.SetCurrentHandler(SelectionManager.Instance);
+
+        List<Transform> selectedUnit = SelectionManager.Instance.CurrentSelection;
+
+        foreach (Transform selectedTransform in selectedUnit)
+        {
+            PathFollower pathFollower = selectedTransform.GetComponent<PathFollower>();
+            if (pathFollower != null)
+            {
+                pathFollower.SetPath(path);
+            }
+        }
+
+        Transform targetItem = SelectionManager.Instance.GetTargetItem();
+        
+        System.Action onSelectionChange = () =>
+        {
+            CameraController.Instance.OrbitCamera.SetTarget(targetItem);
+        };
+
+        SelectionManager.Instance.onSelectionChange += onSelectionChange;
+        SelectionManager.Instance.DeselectAll();
+        SelectionManager.Instance.onSelectionChange -= onSelectionChange;
+    }
+
+
+    #endregion
 }

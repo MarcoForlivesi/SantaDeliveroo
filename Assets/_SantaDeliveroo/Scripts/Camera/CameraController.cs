@@ -4,12 +4,18 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    static public CameraController Instance => instance;
+
+    public OrbitCamera OrbitCamera => orbitCamera;
+    public TacticalViewCamera TacticalViewCamera => tacticalViewCamera;
+
     [SerializeField] private OrbitCamera orbitCamera;
     [SerializeField] private TacticalViewCamera tacticalViewCamera;
     [SerializeField] private float switchTime = 1.5f;
     [SerializeField] private float positionThreshold = 0.01f;
     [SerializeField] private float rotationThreshold = 1.0f;
 
+    static private CameraController instance;
     private bool isTacticalView;
     private bool isSwitching;
 
@@ -18,6 +24,14 @@ public class CameraController : MonoBehaviour
 
     private Vector3 prevPosition;
     private Vector3 prevDirection;
+
+    private void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+    }
 
     private void Start()
     {

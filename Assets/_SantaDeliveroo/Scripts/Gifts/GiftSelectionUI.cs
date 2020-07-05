@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GiftUI : MonoBehaviour
+public class GiftSelectionUI : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI type;
     [SerializeField] private Image[] giftImages;
@@ -20,13 +20,20 @@ public class GiftUI : MonoBehaviour
         }
     }
 
-    private void SetSelectable(ISelectable selectable)
+    public void SetSelectable(ISelectable selectable)
     {
         this.selectable = selectable;
+
+        UpdateUI();
     }
 
     private void UpdateUI()
     {
+        if (selectable == null)
+        {
+            return;
+        }
+
         type.text = selectable.GetSelectableType().ToString();
 
         foreach (Image giftImage in giftImages)
@@ -35,6 +42,16 @@ public class GiftUI : MonoBehaviour
             giftImage.gameObject.SetActive(contains);
 
         }
+    }
+
+    public void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public void Hide()
+    {
+        gameObject.SetActive(false);
     }
 
     private bool Contains(Image giftImage)

@@ -42,6 +42,23 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         SelectionChange();
     }
 
+    public void Deselect(Transform selectableTransform)
+    {
+        List<Transform> lastSelection = new List<Transform>(currentSelection);
+
+        ISelectable selectable = selectableTransform.GetComponent<ISelectable>();
+        if (selectable != null)
+        {
+            currentSelection.Remove(selectableTransform);
+            selectable.Select(false);
+        }
+
+        if (Utils.Equals(currentSelection, lastSelection) == false)
+        {
+            SelectionChange();
+        }
+    }
+
     public void OnMouseLeftClickDown()
     {
         List<Transform> lastSelection = new List<Transform>(currentSelection);
@@ -54,13 +71,23 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         bool hit = Physics.Raycast(raycastVector, out RaycastHit raycastHit, raycastMaxDistance, raycastLayerMask);
         if (hit)
         {
-            ISelectable selectable = raycastHit.collider.GetComponent<ISelectable>();
+            Transform selectableTransform = GetSelectableTransform(raycastHit.collider.transform);
 
-            if (selectable != null)
+            if (selectableTransform != null)
             {
-                selectable.Select(true);
+                ISelectable selectable = selectableTransform.GetComponentInParent<ISelectable>();
 
-                currentSelection.Add(raycastHit.collider.transform);
+                if (selectable != null)
+                {
+                    SelectableType currentType = GetSelectionType();
+
+                    if (currentType == SelectableType.None || selectable.GetSelectableType() == currentType)
+                    {
+                        selectable.Select(true);
+
+                        currentSelection.Add(selectableTransform);
+                    }
+                }
             }
         }
 
@@ -73,12 +100,39 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         }
     }
 
+    private Transform GetSelectableTransform(Transform transform)
+    {
+        if (transform == null)
+        {
+            return null;
+        }
+
+        ISelectable selectable = transform.GetComponent<ISelectable>();
+        if (selectable != null)
+        {
+            return transform;
+        }
+
+        return GetSelectableTransform(transform.parent);
+    }
+
     public void OnMouseLeftClick()
     {
     }
 
     public void OnMouseLeftClickUp()
     {
+    }
+
+    public SelectableType GetSelectionType()
+    {
+        if (currentSelection.Count > 0)
+        {
+            ISelectable selectable = currentSelection[0].GetComponent<ISelectable>();
+            return selectable.GetSelectableType();
+        }
+
+        return SelectableType.None;
     }
 
     private void SelectionChange()

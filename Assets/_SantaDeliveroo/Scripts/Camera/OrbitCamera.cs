@@ -15,11 +15,6 @@ public class OrbitCamera : MonoBehaviour, IMouseHandler
 
     private Vector2 lookPosition;
 
-    private void Start()
-    {
-        SelectionManager.Instance.onSelectionChange += OnSelectionChange;
-    }
-
     void LateUpdate()
     {
         Vector3 targetPosition = GetTargetPosition();
@@ -106,9 +101,8 @@ public class OrbitCamera : MonoBehaviour, IMouseHandler
     }
 
 
-    public void OnSelectionChange()
+    public void SetTarget(Transform targetItem)
     {
-        Transform targetItem = SelectionManager.Instance.GetTargetItem();
         this.target = targetItem;
     }
 }

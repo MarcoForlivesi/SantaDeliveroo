@@ -21,6 +21,7 @@ public enum GiftType
 
 public enum SelectableType
 {
+    None,
     Santa,
     House
 }

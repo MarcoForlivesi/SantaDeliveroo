@@ -27,19 +27,6 @@ public class InputManager : MonoBehaviour
 
     private void Start()
     {
-        SelectionManager.Instance.onSelectionChange += () =>
-        {
-            if (SelectionManager.Instance.CurrentSelection.Count > 0)
-            {
-                InputManager.Instance.SetCurrentHandler(MoveCommand.Instance);
-            }
-        };
-
-        MoveCommand.Instance.onMoveSelected += (list) =>
-        {
-            SelectionManager.Instance.DeselectAll();
-            InputManager.Instance.SetCurrentHandler(SelectionManager.Instance);
-        };
     }
 
     void Update()
