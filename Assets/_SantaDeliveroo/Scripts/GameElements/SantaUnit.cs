@@ -159,4 +159,14 @@ public class SantaUnit : MonoBehaviour, ISelectable
 
         return giftTypes;
     }
+
+    public byte GetPriority()
+    {
+        return 0;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
+    }
 }

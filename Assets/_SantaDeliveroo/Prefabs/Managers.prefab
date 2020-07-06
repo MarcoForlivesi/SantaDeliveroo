@@ -188,6 +188,9 @@ MonoBehaviour:
   gameInfoUI: {fileID: 0}
   giftSelectionUI: {fileID: 0}
   commandUI: {fileID: 0}
+  selectionManager: {fileID: 3290072920259586092}
+  moveCommand: {fileID: 3290072920070726085}
+  inputManager: {fileID: 3290072920177163452}
 --- !u!1 &3290072920259586093
 GameObject:
   m_ObjectHideFlags: 0

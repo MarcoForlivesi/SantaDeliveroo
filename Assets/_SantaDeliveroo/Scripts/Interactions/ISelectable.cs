@@ -8,4 +8,6 @@ public interface ISelectable
 
     SelectableType GetSelectableType();
     List<GiftType> GetGiftTypes();
+    byte GetPriority();
+    Transform GetTransform();
 }

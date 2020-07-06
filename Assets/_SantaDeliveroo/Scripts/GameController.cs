@@ -11,14 +11,16 @@ public class GameController : MonoBehaviour
 {
 
     public static GameController Instance => instance;
+
     public List<SantaUnit> SantaUnits => santaUnits;
     public List<Befana> Befanas => befanas;
     public List<House> HouseSlots => houseSlots;
     public List<Gift> Gifts => gifts;
     public Transform Honolulu => honolulu;
     public int DeliveredGiftToWin => deliveredGiftsToWin;
-    public SelectionManager SelectionManager => SelectionManager.Instance;
-    public MoveCommand MoveCommand => MoveCommand.Instance;
+    public SelectionManager SelectionManager => selectionManager;
+    public MoveCommand MoveCommand => moveCommand;
+    public InputManager InputManager => inputManager;
 
     [SerializeField] private Transform honolulu;
     [SerializeField] private float levelTimeInSecond;
@@ -38,6 +40,10 @@ public class GameController : MonoBehaviour
     [SerializeField] private GameInfoUI gameInfoUI;
     [SerializeField] private GiftSelectionUI giftSelectionUI;
     [SerializeField] private CommandUI commandUI;
+    [Header("Managers")]
+    [SerializeField] private SelectionManager selectionManager;
+    [SerializeField] private MoveCommand moveCommand;
+    [SerializeField] private InputManager inputManager;
 
     private static GameController instance;
     private GameState gameState;
@@ -167,6 +173,7 @@ public class GameController : MonoBehaviour
     {
         startMenuCanvas.gameObject.SetActive(false);
         gameState = GameState.Playing;
+        inputManager.SetCurrentHandler(selectionManager);
 
         foreach (Befana befana in befanas)
         {
@@ -224,7 +231,7 @@ public class GameController : MonoBehaviour
 
     private void OnSelectionChange()
     {
-        List<Transform> currentSelection = SelectionManager.CurrentSelection;
+        List<ISelectable> currentSelection = SelectionManager.CurrentSelection;
 
         if (currentSelection.Count > 0)
         {
@@ -242,7 +249,7 @@ public class GameController : MonoBehaviour
 
             if (currentSelection.Count == 1)
             {
-                ISelectable selectable = currentSelection[0].GetComponent<ISelectable>();
+                ISelectable selectable = currentSelection[0];
                 giftSelectionUI.SetSelectable(selectable);
                 giftSelectionUI.Show();
             }
@@ -259,11 +266,11 @@ public class GameController : MonoBehaviour
     {
         InputManager.Instance.SetCurrentHandler(SelectionManager.Instance);
 
-        List<Transform> selectedUnit = SelectionManager.Instance.CurrentSelection;
+        List<ISelectable> selectedUnit = SelectionManager.Instance.CurrentSelection;
 
-        foreach (Transform selectedTransform in selectedUnit)
+        foreach (ISelectable selectable in selectedUnit)
         {
-            PathFollower pathFollower = selectedTransform.GetComponent<PathFollower>();
+            PathFollower pathFollower = selectable.GetTransform().GetComponent<PathFollower>();
             if (pathFollower != null)
             {
                 pathFollower.SetPath(path);

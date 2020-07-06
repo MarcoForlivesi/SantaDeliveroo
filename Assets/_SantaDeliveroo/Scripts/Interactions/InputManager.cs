@@ -21,12 +21,7 @@ public class InputManager : MonoBehaviour
             instance = this;
         }
 
-        activeMouseHandler = selectionManager;
-        lastMouseHandler = selectionManager;
-    }
-
-    private void Start()
-    {
+        activeMouseHandler = null;
     }
 
     void Update()

@@ -113,6 +113,6 @@ public class Befana : MonoBehaviour
         kidnap = true;
 
         santaUnit.Kidnapped(this);
-        SelectionManager.Instance.Deselect(santaUnit.transform);
+        SelectionManager.Instance.Deselect(santaUnit);
     }
 }

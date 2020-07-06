@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class SelectionManager : MonoBehaviour, IMouseHandler
@@ -7,13 +8,13 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
     public event System.Action onSelectionChange;
 
     static public SelectionManager Instance => instance;
-    public  List<Transform> CurrentSelection => currentSelection;
+    public  List<ISelectable> CurrentSelection => currentSelection;
 
     [SerializeField] private LayerMask raycastLayerMask;
     [SerializeField] private float raycastMaxDistance;
 
     static private SelectionManager instance;
-    private List<Transform> currentSelection;
+    private List<ISelectable> currentSelection;
 
     private void Awake()
     {
@@ -22,7 +23,7 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
             instance = this;
         }
 
-        currentSelection = new List<Transform>();
+        currentSelection = new List<ISelectable>();
     }
 
     private void _DeselectAll()
@@ -42,14 +43,13 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         SelectionChange();
     }
 
-    public void Deselect(Transform selectableTransform)
+    public void Deselect(ISelectable selectable)
     {
-        List<Transform> lastSelection = new List<Transform>(currentSelection);
+        List<ISelectable> lastSelection = new List<ISelectable>(currentSelection);
 
-        ISelectable selectable = selectableTransform.GetComponent<ISelectable>();
         if (selectable != null)
         {
-            currentSelection.Remove(selectableTransform);
+            currentSelection.Remove(selectable);
             selectable.Select(false);
         }
 
@@ -61,34 +61,37 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
 
     public void OnMouseLeftClickDown()
     {
-        List<Transform> lastSelection = new List<Transform>(currentSelection);
+        List<ISelectable> lastSelection = new List<ISelectable>(currentSelection);
         if (Input.GetKey(KeyCode.LeftControl) == false)
         {
             _DeselectAll();
         }
 
         Ray raycastVector = Camera.main.ScreenPointToRay(Input.mousePosition);
-        bool hit = Physics.Raycast(raycastVector, out RaycastHit raycastHit, raycastMaxDistance, raycastLayerMask);
-        if (hit)
+
+        List<ISelectable> selectableHits = new List<ISelectable>();
+        RaycastHit[] raycastHits = Physics.RaycastAll(raycastVector, raycastMaxDistance, raycastLayerMask);
+        foreach(RaycastHit raycastHit in raycastHits)
         {
-            Transform selectableTransform = GetSelectableTransform(raycastHit.collider.transform);
+            ISelectable selectable = GetSelectableItem(raycastHit.collider.transform);
 
-            if (selectableTransform != null)
+            if (selectable != null)
             {
-                ISelectable selectable = selectableTransform.GetComponentInParent<ISelectable>();
+                SelectableType currentType = GetSelectionType();
 
-                if (selectable != null)
+                if (currentType == SelectableType.None || selectable.GetSelectableType() == currentType)
                 {
-                    SelectableType currentType = GetSelectionType();
+                    selectable.Select(true);
 
-                    if (currentType == SelectableType.None || selectable.GetSelectableType() == currentType)
-                    {
-                        selectable.Select(true);
-
-                        currentSelection.Add(selectableTransform);
-                    }
+                    selectableHits.Add(selectable);
                 }
             }
+        }
+
+        if (selectableHits.Count > 0)
+        {
+            ISelectable selectable = selectableHits.OrderBy((item) => item.GetPriority()).First();
+            currentSelection.Add(selectable);
         }
 
         if (Input.GetKey(KeyCode.LeftControl) == false)
@@ -100,7 +103,7 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         }
     }
 
-    private Transform GetSelectableTransform(Transform transform)
+    private ISelectable GetSelectableItem(Transform transform)
     {
         if (transform == null)
         {
@@ -110,10 +113,10 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         ISelectable selectable = transform.GetComponent<ISelectable>();
         if (selectable != null)
         {
-            return transform;
+            return selectable;
         }
 
-        return GetSelectableTransform(transform.parent);
+        return GetSelectableItem(transform.parent);
     }
 
     public void OnMouseLeftClick()
@@ -128,7 +131,7 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
     {
         if (currentSelection.Count > 0)
         {
-            ISelectable selectable = currentSelection[0].GetComponent<ISelectable>();
+            ISelectable selectable = currentSelection[0];
             return selectable.GetSelectableType();
         }
 
@@ -152,9 +155,9 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
             return null;
         }
 
-        foreach (Transform item in currentSelection)
+        foreach (ISelectable selectable in currentSelection)
         {
-            center += item.position;
+            center += selectable.GetTransform().position;
         }
 
         center = center / currentSelection.Count;
@@ -162,8 +165,10 @@ public class SelectionManager : MonoBehaviour, IMouseHandler
         Transform centerItem = null;
         float minDistance = -1;
 
-        foreach (Transform item in currentSelection)
+        foreach (ISelectable selectable in currentSelection)
         {
+            Transform item = selectable.GetTransform();
+
             if (centerItem == null)
             {
                 minDistance = Vector3.Distance(center, item.position);

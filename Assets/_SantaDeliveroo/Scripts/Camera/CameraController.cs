@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour
     [SerializeField] private float switchTime = 1.5f;
     [SerializeField] private float positionThreshold = 0.01f;
     [SerializeField] private float rotationThreshold = 1.0f;
+    [SerializeField] private KeyCode[] moveKeys;
 
     static private CameraController instance;
     private bool isTacticalView;
@@ -49,29 +50,25 @@ public class CameraController : MonoBehaviour
         {
             if (isTacticalView)
             {
-                orbitCamera.enabled = true;
-                tacticalViewCamera.enabled = false;
-
-                targetFoV = prevFoV;
-                targetPosition = prevPosition;
-                targetDirection = prevDirection;
+                SetOrbitView();
             }
             else
             {
-                orbitCamera.enabled = false;
-                tacticalViewCamera.enabled = true;
-
-                targetFoV = tacticalViewCamera.Camera.fieldOfView;
-                targetPosition = tacticalViewCamera.transform.position;
-                targetDirection = tacticalViewCamera.transform.forward;
-
-                prevFoV = orbitCamera.Camera.fieldOfView;
-                prevPosition = orbitCamera.transform.position;
-                prevDirection = orbitCamera.transform.forward;
+                SetTacticalView();
             }
 
             isSwitching = true;
             isTacticalView = !isTacticalView;
+        }
+
+        foreach (KeyCode keyCode in moveKeys)
+        {
+            if (Input.GetKey(keyCode))
+            {
+                isSwitching = false;
+                isTacticalView = false;
+                SetOrbitView();
+            }
         }
 
         if (isSwitching)
@@ -80,6 +77,29 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    private void SetTacticalView()
+    {
+        orbitCamera.enabled = false;
+        tacticalViewCamera.enabled = true;
+
+        targetFoV = tacticalViewCamera.Camera.fieldOfView;
+        targetPosition = tacticalViewCamera.Camera.transform.position;
+        targetDirection = tacticalViewCamera.Camera.transform.forward;
+
+        prevFoV = orbitCamera.Camera.fieldOfView;
+        prevPosition = orbitCamera.transform.position;
+        prevDirection = orbitCamera.transform.forward;
+    }
+
+    private void SetOrbitView()
+    {
+        orbitCamera.enabled = true;
+        tacticalViewCamera.enabled = false;
+
+        targetFoV = prevFoV;
+        targetPosition = prevPosition;
+        targetDirection = prevDirection;
+    }
 
     private void SwitchCamera()
     {

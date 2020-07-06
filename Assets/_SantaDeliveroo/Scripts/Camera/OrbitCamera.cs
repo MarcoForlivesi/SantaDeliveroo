@@ -42,12 +42,10 @@ public class OrbitCamera : MonoBehaviour, IMouseHandler
             targetPosition += deltaInputMovement;
         }
 
-
         if (target != null)
         {
             targetPosition = target.position;
-            Vector3 lookDirection = transform.forward;
-            targetPosition = targetPosition - lookDirection * distance;
+            targetPosition = targetPosition - transform.forward * distance;
         }
 
         return targetPosition;

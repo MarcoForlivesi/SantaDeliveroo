@@ -87,4 +87,14 @@ public class House : MonoBehaviour, IPointInteractable, ISelectable
     {
         return giftRequests;
     }
+
+    public byte GetPriority()
+    {
+        return 1;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
+    }
 }
