@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Gift : MonoBehaviour, IPointInteractable
+public class Gift : MonoBehaviour, IPointInteractable, ISelectable
 {
     public GiftType Type => giftType;
 
@@ -10,6 +10,7 @@ public class Gift : MonoBehaviour, IPointInteractable
     [SerializeField] private Transform hint;
 
     private Rigidbody rigidbody;
+    private bool select;
 
     private void Start()
     {
@@ -47,5 +48,32 @@ public class Gift : MonoBehaviour, IPointInteractable
     public Vector3 GetPoint()
     {
         return transform.position;
+    }
+
+    public void Select(bool value)
+    {
+        select = value;
+    }
+
+    public SelectableType GetSelectableType()
+    {
+        return SelectableType.Gift;
+    }
+
+    public List<GiftType> GetGiftTypes()
+    {
+        List<GiftType> list = new List<GiftType>();
+        list.Add(giftType);
+        return list;
+    }
+
+    public byte GetPriority()
+    {
+        return 2;
+    }
+
+    public Transform GetTransform()
+    {
+        return transform;
     }
 }
