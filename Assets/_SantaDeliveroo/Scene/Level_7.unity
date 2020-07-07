@@ -17836,12 +17836,12 @@ PrefabInstance:
     - target: {fileID: 3290072920178060333, guid: 4aa3cf318bf407d4981119a42fefb985,
         type: 3}
       propertyPath: deliveredGiftsToWin
-      value: 1
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3290072920178060333, guid: 4aa3cf318bf407d4981119a42fefb985,
         type: 3}
       propertyPath: levelTimeInSecond
-      value: 120
+      value: 700
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4aa3cf318bf407d4981119a42fefb985, type: 3}
